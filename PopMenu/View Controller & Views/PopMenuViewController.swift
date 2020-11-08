@@ -106,9 +106,19 @@ final public class PopMenuViewController: UIViewController {
         return tapper
     }()
     
+    // In order to instantly react to the touch
+    fileprivate class InstantPanGestureRecognizer: UIPanGestureRecognizer {
+        override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
+            if self.state == .began { return }
+            super.touchesBegan(touches, with: event)
+            self.state = .began
+        }
+
+    }
+    
     /// Pan gesture to highligh actions.
     fileprivate lazy var panGestureForMenu: UIPanGestureRecognizer = {
-        let panner = UIPanGestureRecognizer(target: self, action: #selector(menuDidPan(_:)))
+        let panner = InstantPanGestureRecognizer(target: self, action: #selector(menuDidPan(_:)))
         panner.maximumNumberOfTouches = 1
         
         return panner
