@@ -51,6 +51,9 @@ final public class PopMenuAppearance: NSObject {
     /// The presentation style
     public var popMenuPresentationStyle: PopMenuPresentationStyle = .cover()
 
+    public var popMenuPadding: UIEdgeInsets = .init(top: 12, left: 10, bottom: 12, right: 10)
+    
+    public var actionsSpacing: CGFloat = 10
 }
 
 /// Background styles for PopMenu.
@@ -103,14 +106,16 @@ public struct PopMenuColor {
     /// Action tint color instance.
     public var actionColor: PopMenuActionColor
     
+    public var selectionColor: PopMenuActionColor
+    
     /// Compose the color.
-    public static func configure(background: PopMenuActionBackgroundColor, action: PopMenuActionColor) -> PopMenuColor {
-        return PopMenuColor(backgroundColor: background, actionColor: action)
+    public static func configure(background: PopMenuActionBackgroundColor, action: PopMenuActionColor, selectionColor: PopMenuActionColor) -> PopMenuColor {
+        return PopMenuColor(backgroundColor: background, actionColor: action, selectionColor: selectionColor)
     }
     
     /// Get default background and action color.
     public static func `default`() -> PopMenuColor {
-        return PopMenuColor(backgroundColor: .gradient(fill: #colorLiteral(red: 0.168627451, green: 0.168627451, blue: 0.168627451, alpha: 1), #colorLiteral(red: 0.2156862745, green: 0.2156862745, blue: 0.2156862745, alpha: 1)), actionColor: .tint(.white))
+        return PopMenuColor(backgroundColor: .gradient(fill: #colorLiteral(red: 0.168627451, green: 0.168627451, blue: 0.168627451, alpha: 1), #colorLiteral(red: 0.2156862745, green: 0.2156862745, blue: 0.2156862745, alpha: 1)), actionColor: .tint(.white), selectionColor: .init(color: .black))
     }
     
 }

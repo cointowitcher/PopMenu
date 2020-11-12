@@ -1,69 +1,18 @@
 //
-//  PopMenuAction.swift
-//  PopMenu
+//  PopuptodoAction.swift
+//  TodoApp
 //
-//  Created by Cali Castle  on 4/13/18.
-//  Copyright © 2018 PopMenu. All rights reserved.
+//  Created by sergey on 11.11.2020.
 //
 
+import Foundation
 import UIKit
-
-/// Customize your own action and conform to `PopMenuAction` protocol.
-@objc public protocol PopMenuAction: NSObjectProtocol {
-    
-    /// Title of the action.
-    var title: String? { get }
-    
-    /// Image of the action.
-    var image: UIImage? { get }
-    
-    /// Container view of the action.
-    var view: UIView { get }
-    
-    /// The initial color of the action.
-    var color: Color? { get }
-    
-    /// The handler of action.
-    var didSelect: PopMenuActionHandler? { get }
-    
-    /// Left padding when texts-only.
-    static var textLeftPadding: CGFloat { get }
-    
-    /// Icon left padding when icons are present.
-    static var iconLeftPadding: CGFloat { get }
-    
-    /// Icon sizing.
-    var iconWidthHeight: CGFloat { get set }
-    
-    /// The color to set for both label and icon.
-    var tintColor: UIColor { get set }
-    
-    var overlayColor: UIColor { get set }
-    
-    /// The font for label.
-    var font: UIFont { get set }
-    
-    /// The corner radius of action view.
-    var cornerRadius: CGFloat { get set }
-    
-    /// Is the view highlighted by gesture.
-    var highlighted: Bool { get set }
-    
-    /// Render the view for action.
-    func renderActionView()
-
-    /// Called when the action gets selected.
-    @objc optional func actionSelected(animated: Bool)
-    
-    @objc optional func setOverlayViewCornerRadius(_ cornerRadius: CGFloat)
- 
-    /// Type alias for selection handler.
-    typealias PopMenuActionHandler = (PopMenuAction) -> Void
-    
-}
+import PopMenu
 
 /// The default PopMenu action class.
-public class PopMenuDefaultAction: NSObject, PopMenuAction {
+public class PopuptodoAction: NSObject, PopMenuAction {
+    
+    public static var iconLeftPadding: CGFloat = 0
     
     /// Title of action.
     public let title: String?
@@ -84,7 +33,13 @@ public class PopMenuDefaultAction: NSObject, PopMenuAction {
     public let didSelect: PopMenuActionHandler?
     
     /// Icon sizing.
-    public var iconWidthHeight: CGFloat = 27
+    public var iconWidthHeight: CGFloat = 21
+    
+    public var iconLeftPadding: CGFloat = 19
+        
+    public var iconToTextOffset: CGFloat = 14
+    
+    private let overlayView = UIView()
     
     // MARK: - Computed Properties
     
@@ -95,8 +50,7 @@ public class PopMenuDefaultAction: NSObject, PopMenuAction {
         }
         set {
             titleLabel.textColor = newValue
-            iconImageView.tintColor = newValue
-            overlayColor = newValue.blackOrWhiteContrastingColor()
+            overlayColor = newValue
         }
     }
     
@@ -148,8 +102,7 @@ public class PopMenuDefaultAction: NSObject, PopMenuAction {
     private lazy var iconImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.image = image?.withRenderingMode(imageRenderingMode)
-        imageView.tintColor = nil
+        imageView.image = image
         
         return imageView
     }()
@@ -157,7 +110,6 @@ public class PopMenuDefaultAction: NSObject, PopMenuAction {
     // MARK: - Constants
     
     public static let textLeftPadding: CGFloat = 25
-    public static let iconLeftPadding: CGFloat = 18
     
     // MARK: - Initializer
     
@@ -169,6 +121,11 @@ public class PopMenuDefaultAction: NSObject, PopMenuAction {
         self.didSelect = didSelect
         
         view = UIView()
+        overlayView.backgroundColor = .clear
+    }
+    
+    @objc func setOverlayViewCornerRadius(_ cornerRadius: CGFloat) {
+        overlayView.layer.cornerRadius = cornerRadius
     }
     
     /// Setup necessary views.
@@ -182,7 +139,7 @@ public class PopMenuDefaultAction: NSObject, PopMenuAction {
             NSLayoutConstraint.activate([
                 iconImageView.widthAnchor.constraint(equalToConstant: iconWidthHeight),
                 iconImageView.heightAnchor.constraint(equalTo: iconImageView.widthAnchor),
-                iconImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: PopMenuDefaultAction.iconLeftPadding),
+                iconImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: iconLeftPadding),
                 iconImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
             ])
         }
@@ -190,15 +147,24 @@ public class PopMenuDefaultAction: NSObject, PopMenuAction {
         view.addSubview(titleLabel)
         
         NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: hasImage ? iconImageView.trailingAnchor : view.leadingAnchor, constant: hasImage ? 8 : PopMenuDefaultAction.textLeftPadding),
-            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 20),
+            titleLabel.leadingAnchor.constraint(equalTo: hasImage ? iconImageView.trailingAnchor : view.leadingAnchor, constant: hasImage ? iconToTextOffset : iconLeftPadding),
+            titleLabel.trailingAnchor.constraint(greaterThanOrEqualTo: view.trailingAnchor, constant: 20),
             titleLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+        
+        view.addSubview(overlayView)
+        overlayView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            overlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            overlayView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            overlayView.topAnchor.constraint(equalTo: view.topAnchor),
+            overlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
 
     /// Load and configure the action view.
     public func renderActionView() {
-        view.layer.cornerRadius = 14
+//        view.layer.cornerRadius = 14
         view.layer.masksToBounds = true
         
         configureViews()
@@ -209,8 +175,7 @@ public class PopMenuDefaultAction: NSObject, PopMenuAction {
     public func highlightActionView(_ highlight: Bool) {
         DispatchQueue.main.async {
             UIView.animate(withDuration: 0.26, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 9, options: self.highlighted ? UIView.AnimationOptions.curveEaseIn : UIView.AnimationOptions.curveEaseOut, animations: {
-                self.view.transform = self.highlighted ? CGAffineTransform.identity.scaledBy(x: 1.09, y: 1.09) : .identity
-                self.view.backgroundColor = self.highlighted ? self.overlayColor.withAlphaComponent(0.25) : .clear
+                self.overlayView.backgroundColor = self.highlighted ? self.overlayColor.withAlphaComponent(0.25) : .clear
             }, completion: nil)
         }
     }
@@ -225,15 +190,15 @@ public class PopMenuDefaultAction: NSObject, PopMenuAction {
         
         DispatchQueue.main.async {
             UIView.animate(withDuration: 0.175, animations: {
-                self.view.transform = CGAffineTransform.identity.scaledBy(x: 0.915, y: 0.915)
-                self.view.backgroundColor = self.overlayColor.withAlphaComponent(0.18)
+                self.overlayView.backgroundColor = self.overlayColor.withAlphaComponent(0.18)
             }, completion: { _ in
                 UIView.animate(withDuration: 0.175, animations: {
-                    self.view.transform = .identity
-                    self.view.backgroundColor = .clear
+                    self.overlayView.backgroundColor = .clear
                 })
             })
         }
     }
     
 }
+
+

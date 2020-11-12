@@ -9,6 +9,23 @@
 import UIKit
 import PopMenu
 
+extension UIResponder {
+
+    /// The responder chain from the target responder (self)
+    ///     to the `UIApplication` and the app delegate
+    var responderChain: [UIResponder] {
+        var responderChain: [UIResponder] = []
+        var currentResponder: UIResponder? = self
+
+        while currentResponder != nil {
+            responderChain.append(currentResponder!)
+            currentResponder = currentResponder?.next
+        }
+
+        return responderChain
+    }
+}
+
 class RootViewController: UITableViewController {
 
     // Table header titles.
@@ -43,39 +60,61 @@ class RootViewController: UITableViewController {
     
     /// Top right bar button tapped
     @IBAction func topRightButtonDidTap(_ sender: UIBarButtonItem) {
-        if shouldUseManager {
-            showMenuWithManager(for: sender)
-        } else {
+//        if shouldUseManager {
+//            showMenuWithManager(for: sender)
+//        } else {
             showMenuManually(for: sender)
-        }
+//        }
     }
     
     /// This shows how to use PopMenu the old fashion way
     /// Manually init the controller with actions array
     /// Customize whatever you want and present here
     fileprivate func showMenuManually(for barButtonItem: UIBarButtonItem) {
-        // Create menu controller with actions
-        let controller = PopMenuViewController(sourceView: barButtonItem, actions: [
-            PopMenuDefaultAction(title: "Click me to", image: #imageLiteral(resourceName: "Plus"), color: .yellow),
-            PopMenuDefaultAction(title: "Pop another menu", image: #imageLiteral(resourceName: "Heart"), color: #colorLiteral(red: 0.9816910625, green: 0.5655395389, blue: 0.4352460504, alpha: 1)),
-            PopMenuDefaultAction(title: "Try it out!", image: nil, color: .white)
-        ])
-        
-        // Customize appearance
-        controller.appearance.popMenuFont = UIFont(name: "AvenirNext-DemiBold", size: 16)!
-        controller.appearance.popMenuBackgroundStyle = .blurred(.dark)
-        // Configure options
-        controller.shouldDismissOnSelection = false
-        controller.delegate = self
-        
-        controller.didDismiss = { selected in
-            print("Menu dismissed: \(selected ? "selected item" : "no selection")")
+//        // Create menu controller with actions
+//        let controller = PopMenuViewController(sourceView: barButtonItem, actions: [
+//            PopMenuDefaultAction(title: "Click me to", image: #imageLiteral(resourceName: "Plus"), color: .yellow),
+//            PopMenuDefaultAction(title: "Pop another menu", image: #imageLiteral(resourceName: "Heart"), color: #colorLiteral(red: 0.9816910625, green: 0.5655395389, blue: 0.4352460504, alpha: 1)),
+//            PopMenuDefaultAction(title: "Try it out!", image: nil, color: .white)
+//        ])
+//
+//        // Customize appearance
+//        controller.appearance.popMenuFont = UIFont(name: "AvenirNext-DemiBold", size: 16)!
+//        controller.appearance.popMenuBackgroundStyle = .blurred(.dark)
+//        // Configure options
+//        controller.shouldDismissOnSelection = false
+//        controller.delegate = self
+//
+//        controller.didDismiss = { selected in
+//            print("Menu dismissed: \(selected ? "selected item" : "no selection")")
+//        }
+//
+//        // Present menu controller
+        let actions: [PopMenuAction] = [
+            PopuptodoAction(title: "Open Tags", image: UIImage(named: "tag"), didSelect: { _ in }),
+            PopuptodoAction(title: "Sort by name", image: UIImage(named: "switch"), didSelect: { _ in }),
+            PopuptodoAction(title: "Edit Projects", image: UIImage(named: "adjustments"), didSelect: { _ in })
+        ]
+        actions.forEach {
+            $0.iconWidthHeight = 21
+            
         }
+        let popMenu = PopMenuViewController(sourceView: barButtonItem, actions: actions)
+        popMenu.appearance.popMenuCornerRadius = 16
+        popMenu.appearance.popMenuColor.actionColor = .tint(.black)
+        popMenu.appearance.popMenuColor.backgroundColor = .solid(fill: .white)
+        popMenu.appearance.popMenuFont = .systemFont(ofSize: 18, weight: .semibold)
+        popMenu.appearance.popMenuItemSeparator = .fill(UIColor(red: 0.875, green: 0.875, blue: 0.875, alpha: 1), height: 1)
+        popMenu.appearance.popMenuActionHeight = 43
+        popMenu.appearance.actionsSpacing = 10
+        popMenu.appearance.popMenuColor.actionColor = .tint(.black)
+        popMenu.appearance.popMenuColor.selectionColor = .tint(UIColor(red: 0.267, green: 0.482, blue: 0.996, alpha: 1))
+        popMenu.appearance.popMenuBackgroundStyle = .dimmed(color: UIColor(red: 0.965, green: 0.965, blue: 0.953, alpha: 1), opacity: 0.5)
         
-        // Present menu controller
-        present(controller, animated: true, completion: nil)
+        popMenu.appearance.popMenuPadding = .init(top: 12, left: 10, bottom: 12, right: 10)
+
+        present(popMenu, animated: true)
     }
-    
     /// This shows how to use PopMenu with PopMenuManager
     fileprivate func showMenuWithManager(for barButtonItem: UIBarButtonItem) {
         // Get manager instance

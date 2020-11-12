@@ -248,13 +248,13 @@ extension PopMenuViewController {
         if let isBlurred = backgroundStyle.isBlurred,
             isBlurred,
             let blurStyle = backgroundStyle.blurStyle {
-            
+
             let blurView = UIVisualEffectView(effect: UIBlurEffect(style: blurStyle))
             blurView.frame = backgroundView.frame
-            
+
             backgroundView.addSubview(blurView)
         }
-        
+
         // Dimmed background
         if let isDimmed = backgroundStyle.isDimmed,
             isDimmed,
@@ -270,10 +270,11 @@ extension PopMenuViewController {
     /// Setup the content view.
     fileprivate func configureContentView() {
         containerView.translatesAutoresizingMaskIntoConstraints = false
-        containerView.addShadow(offset: .init(width: 0, height: 1), opacity: 0.5, radius: 20)
+        containerView.addShadow(offset: .init(width: 0, height: 8), opacity: 0.1, radius: 20, color: UIColor(red: 36/255, green: 36/255, blue: 36/255, alpha: 1))
         containerView.layer.cornerRadius = appearance.popMenuCornerRadius
         containerView.backgroundColor = .clear
         
+        view.backgroundColor = .clear
         view.addSubview(containerView)
         
         contentView.translatesAutoresizingMaskIntoConstraints = false
@@ -297,7 +298,7 @@ extension PopMenuViewController {
             }
         }
 
-        containerView.addSubview(blurOverlayView)
+//        containerView.addSubview(blurOverlayView)
         containerView.addSubview(contentView)
         
         setupContentConstraints()
@@ -325,12 +326,12 @@ extension PopMenuViewController {
             contentView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
         ])
         // Activate blur overlay constraints
-        NSLayoutConstraint.activate([
-            blurOverlayView.leftAnchor.constraint(equalTo: containerView.leftAnchor),
-            blurOverlayView.rightAnchor.constraint(equalTo: containerView.rightAnchor),
-            blurOverlayView.topAnchor.constraint(equalTo: containerView.topAnchor),
-            blurOverlayView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
-        ])
+//        NSLayoutConstraint.activate([
+//            blurOverlayView.leftAnchor.constraint(equalTo: containerView.leftAnchor),
+//            blurOverlayView.rightAnchor.constraint(equalTo: containerView.rightAnchor),
+//            blurOverlayView.topAnchor.constraint(equalTo: containerView.topAnchor),
+//            blurOverlayView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
+//        ])
     }
     
     /// Determine the fitting frame for content.
@@ -341,10 +342,10 @@ extension PopMenuViewController {
         
         if actions.count >= appearance.popMenuActionCountForScrollable {
             // Make scroll view
-            height = CGFloat(appearance.popMenuActionCountForScrollable) * appearance.popMenuActionHeight
+            height = CGFloat(appearance.popMenuActionCountForScrollable) * appearance.popMenuActionHeight + CGFloat((actions.count - 1)) * appearance.actionsSpacing + appearance.popMenuPadding.top + appearance.popMenuPadding.bottom
             height -= 20
         } else {
-            height = CGFloat(actions.count) * appearance.popMenuActionHeight
+            height = CGFloat(actions.count) * appearance.popMenuActionHeight + CGFloat((actions.count - 1)) * appearance.actionsSpacing + appearance.popMenuPadding.top + appearance.popMenuPadding.bottom
         }
         
         let size = CGSize(width: calculateContentWidth(), height: height)
@@ -444,7 +445,7 @@ extension PopMenuViewController {
             contentFitWidth += action.iconWidthHeight
         }
         
-        return min(contentFitWidth,maxContentWidth)
+        return min(max(contentFitWidth, 239), maxContentWidth)
     }
     
     /// Setup actions view.
@@ -453,12 +454,15 @@ extension PopMenuViewController {
         actionsView.axis = .vertical
         actionsView.alignment = .fill
         actionsView.distribution = .fillEqually
+        actionsView.spacing = appearance.actionsSpacing
 
         // Configure each action
         actions.forEach { action in
             action.font = appearance.popMenuFont
             action.tintColor = action.color ?? appearance.popMenuColor.actionColor.color
             action.cornerRadius = appearance.popMenuCornerRadius / 2
+            action.overlayColor = appearance.popMenuColor.selectionColor.color
+            action.setOverlayViewCornerRadius?(appearance.popMenuCornerRadius / 2)
             action.renderActionView()
             
             // Give separator to each action but the last
@@ -470,6 +474,7 @@ extension PopMenuViewController {
             tapper.delaysTouchesEnded = false
             
             action.view.addGestureRecognizer(tapper)
+            action.view.clipsToBounds = false
             
             actionsView.addArrangedSubview(action.view)
         }
@@ -507,10 +512,10 @@ extension PopMenuViewController {
             contentView.addSubview(actionsView)
             
             NSLayoutConstraint.activate([
-                actionsView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-                actionsView.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-                actionsView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
-                actionsView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4)
+                actionsView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: appearance.popMenuPadding.left),
+                actionsView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -appearance.popMenuPadding.right),
+                actionsView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: appearance.popMenuPadding.top),
+                actionsView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -appearance.popMenuPadding.bottom)
             ])
         }
     }
@@ -535,7 +540,7 @@ extension PopMenuViewController {
         NSLayoutConstraint.activate([
             separatorView.leftAnchor.constraint(equalTo: actionView.leftAnchor),
             separatorView.rightAnchor.constraint(equalTo: actionView.rightAnchor),
-            separatorView.bottomAnchor.constraint(equalTo: actionView.bottomAnchor),
+            separatorView.bottomAnchor.constraint(equalTo: actionView.bottomAnchor, constant: appearance.actionsSpacing / 2 + separator.height / 2),
             separatorView.heightAnchor.constraint(equalToConstant: separator.height)
         ])
     }

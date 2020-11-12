@@ -16,6 +16,7 @@
 		9D397ABF20805CE400C58037 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9D397ABD20805CE400C58037 /* Main.storyboard */; };
 		9D397AC120805CE500C58037 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D397AC020805CE500C58037 /* Assets.xcassets */; };
 		9D397AC420805CE500C58037 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9D397AC220805CE500C58037 /* LaunchScreen.storyboard */; };
+		A533E0B5255C9E8900B301C7 /* Popuptodoaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A533E0B4255C9E8900B301C7 /* Popuptodoaction.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -45,6 +46,7 @@
 		9D397AC320805CE500C58037 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9D397AC520805CE500C58037 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9D397ADE208065DB00C58037 /* PopMenu.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = PopMenu.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A533E0B4255C9E8900B301C7 /* Popuptodoaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Popuptodoaction.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +82,7 @@
 			children = (
 				8D6F4B3F208562E400B1033E /* Helper */,
 				9D397ABB20805CE400C58037 /* RootViewController.swift */,
+				A533E0B4255C9E8900B301C7 /* Popuptodoaction.swift */,
 				9D05881720840429009AD267 /* NavigationController.swift */,
 			);
 			path = "View Controllers";
@@ -223,6 +226,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A533E0B5255C9E8900B301C7 /* Popuptodoaction.swift in Sources */,
 				9D397ABC20805CE400C58037 /* RootViewController.swift in Sources */,
 				9D05881820840429009AD267 /* NavigationController.swift in Sources */,
 				9D397ABA20805CE400C58037 /* AppDelegate.swift in Sources */,
