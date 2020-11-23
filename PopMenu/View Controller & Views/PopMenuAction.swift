@@ -180,7 +180,8 @@ public class PopMenuDefaultAction: NSObject, PopMenuAction {
             view.addSubview(iconImageView)
             
             NSLayoutConstraint.activate([
-                iconImageView.heightAnchor.constraint(equalTo: iconWidthHeight),
+                iconImageView.widthAnchor.constraint(equalToConstant: iconWidthHeight),
+                iconImageView.heightAnchor.constraint(equalTo: iconImageView.widthAnchor),
                 iconImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: PopMenuDefaultAction.iconLeftPadding),
                 iconImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
             ])
@@ -189,7 +190,7 @@ public class PopMenuDefaultAction: NSObject, PopMenuAction {
         view.addSubview(titleLabel)
         
         NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: hasImage ? iconLeftPadding + iconWidthHeight + iconToTextOffset : iconLeftPadding),
+            titleLabel.leadingAnchor.constraint(equalTo: hasImage ? iconImageView.trailingAnchor : view.leadingAnchor, constant: hasImage ? 8 : PopMenuDefaultAction.textLeftPadding),
             titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 20),
             titleLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
